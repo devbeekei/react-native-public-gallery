@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
 	description: {
 		marginTop: 16,
 		fontSize: 21,
-		color: "#75757",
+		color: "#757575",
 	},
 });
 

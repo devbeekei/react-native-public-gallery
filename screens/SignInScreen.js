@@ -5,6 +5,7 @@ import SignForm from "../components/SignForm";
 import SignButtons from "../components/SignButtons";
 import { signIn, signUp } from "../lib/auth";
 import { getUser } from "../lib/users";
+import { useUserContext } from "../contexts/UserContext";
 
 function SignInScreen({navigation, route}) {
 	const {isSignUp} = route.params ?? {};
@@ -14,6 +15,7 @@ function SignInScreen({navigation, route}) {
 		confirmPassword: "",
 	});
 	const [loading, setLoading] = useState(false);
+	const {setUser} = useUserContext();
 	
 	const createChangeTextHandler = (name) => (value) => {
 		setForm({...form, [name]: value});
@@ -34,15 +36,18 @@ function SignInScreen({navigation, route}) {
 		try {
 			const {user} = isSignUp ? await signUp(info) : await signIn(info);
 			const profile = await getUser(user.uid);
+			console.log("profile", profile);
 			if (!profile) {
 				navigation.navigate("Welcome", {uid: user.uid});
+			} else {
+				setUser(profile);
 			}
 		} catch (e) {
 			const resultMessage = messages[e.code] ? 
 				messages[e.code] : 
 				isSignUp ? "알 수 없는 이유로 회원가입에 실패하였습니다." : "알 수 없는 이유로 로그인에 실패하였습니다.";
 			Alert.alert(isSignUp ? "회원가입 실패" : "로그인 실패", resultMessage);
-		} finally {
+			setUser(null);
 			setLoading(false);
 		}
 	}
